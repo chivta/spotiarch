@@ -1,0 +1,8 @@
+.claude
+config.json
+.env
+*.log
+tmp/
+
+*.md
+!README.md
