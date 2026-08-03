@@ -1,5 +1,19 @@
-.claude
+# Environment
 .env
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+
+# Logs
 *.log
-*.md
-!README.md
+
+# Tool configs
+.claude
+
+# Decrypted secrets — only k8s/secrets.enc.yaml is committed
+k8s/secrets.yaml
