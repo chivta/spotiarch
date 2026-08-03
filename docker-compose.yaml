@@ -3,37 +3,53 @@ services:
     restart: unless-stopped
     build:
       context: ./backend
+      dockerfile: Dockerfile.api
       target: dev
-      dockerfile: Dockerfile
     volumes:
       - ./backend:/build
-      - ./backend/config.docker.json:/build/config.json:ro
+    environment:
+      DATABASE_URL: postgres://spotiarch:spotiarch@postgres:5432/spotiarch?sslmode=disable
+      REDIS_URL: redis://redis:6379
+      JWT_SECRET: dev-only-jwt-secret-change-before-production
+      SECURE_COOKIES: "false"
+      SPOTIFY_CLIENT_ID: ${SPOTIFY_CLIENT_ID:-}
+      SPOTIFY_CLIENT_SECRET: ${SPOTIFY_CLIENT_SECRET:-}
+      SPOTIFY_REFRESH_TOKEN: ${SPOTIFY_REFRESH_TOKEN:-}
     healthcheck:
-      test: ["CMD", "wget", "-qO-", "http://127.0.0.1:3000/"]
-      start_period: 60s
+      test: ["CMD", "wget", "-qO-", "http://127.0.0.1:8080/health"]
+      start_period: 30s
       interval: 5s
       timeout: 5s
       retries: 5
     ports:
-      - "3000:3000"
+      - "8080:8080"
     depends_on:
       postgres:
         condition: service_healthy
-      migrate:
-        condition: service_completed_successfully
+      redis:
+        condition: service_healthy
 
-  migrate:
+  watcher:
+    restart: unless-stopped
     build:
       context: ./backend
-      target: migrate
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile.watcher
+      target: dev
     volumes:
-      - ./backend/migrations:/build/migrations
+      - ./backend:/build
     environment:
-      - GOOSE_DRIVER=postgres
-      - GOOSE_DBSTRING=postgres://app:app@postgres:5432/app?sslmode=disable
-      - GOOSE_MIGRATION_DIR=./migrations
-      - GOOSE_TABLE=goose_migrations
+      DATABASE_URL: postgres://spotiarch:spotiarch@postgres:5432/spotiarch?sslmode=disable
+      SPOTIFY_CLIENT_ID: ${SPOTIFY_CLIENT_ID:-}
+      SPOTIFY_CLIENT_SECRET: ${SPOTIFY_CLIENT_SECRET:-}
+      SPOTIFY_REFRESH_TOKEN: ${SPOTIFY_REFRESH_TOKEN:-}
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://127.0.0.1:8081/health"]
+      start_period: 30s
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    ports:
+      - "8081:8081"
     depends_on:
       postgres:
         condition: service_healthy
@@ -46,7 +62,13 @@ services:
       - ./frontend:/app
       - frontend_node_modules:/app/node_modules
     environment:
-      - VITE_API_BASE_URL=http://localhost:3000/api
+      VITE_API_BASE_URL: http://localhost:8080/api
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://127.0.0.1:5173/"]
+      start_period: 30s
+      interval: 5s
+      timeout: 5s
+      retries: 5
     ports:
       - "5173:5173"
     depends_on:
@@ -57,19 +79,33 @@ services:
     image: postgres:17-alpine
     restart: unless-stopped
     environment:
-      POSTGRES_USER: app
-      POSTGRES_PASSWORD: app
-      POSTGRES_DB: app
-    ports:
-      - "5432:5432"
+      POSTGRES_USER: spotiarch
+      POSTGRES_PASSWORD: spotiarch
+      POSTGRES_DB: spotiarch
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U app -d app"]
+      test: ["CMD-SHELL", "pg_isready -U spotiarch -d spotiarch"]
       interval: 10s
       timeout: 5s
       retries: 5
+    ports:
+      - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
 
+  redis:
+    image: redis:8-alpine
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+
 volumes:
   postgres_data:
+  redis_data:
   frontend_node_modules:

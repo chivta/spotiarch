@@ -1,9 +1,9 @@
 tmp_dir = "tmp"
 
 [build]
-  cmd = "go build -o ./tmp/api ./cmd/api"
-  bin = "./tmp/api"
-  entrypoint = ["./tmp/api"]
+  cmd = "go build -o ./tmp/watcher ./cmd/watcher"
+  bin = "./tmp/watcher"
+  entrypoint = ["./tmp/watcher"]
   exclude_dir = ["tmp"]
   include_ext = ["go"]
   pre_cmd = ["mkdir -p tmp"]

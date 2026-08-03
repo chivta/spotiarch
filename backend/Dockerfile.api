@@ -1,0 +1,20 @@
+# Development with hot reload
+FROM golang:1.25.7-alpine AS dev
+WORKDIR /build
+RUN go install github.com/air-verse/air@v1.65.1
+COPY go.mod go.sum ./
+RUN go mod download
+CMD ["air", "-c", ".air.toml"]
+
+# Production builder
+FROM golang:1.25.7-alpine AS builder
+WORKDIR /build
+COPY go.mod go.sum ./
+RUN go mod download
+COPY . .
+RUN CGO_ENABLED=0 GOOS=linux go build -ldflags="-w -s" -o /app ./cmd/api
+
+# Production runtime
+FROM gcr.io/distroless/static:nonroot AS production
+COPY --from=builder /app /app
+ENTRYPOINT ["/app"]
