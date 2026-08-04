@@ -19,15 +19,35 @@ separate migration container or deployment job.
 
 ## Local development
 
-Install Docker with Compose, export the Spotify service-account credentials, and
-start the development stack:
+Install Docker with Compose, put the Spotify service-account credentials in
+`backend/.env` (see `backend/.example.env`), and start the development stack:
 
 ```sh
-export SPOTIFY_CLIENT_ID=...
-export SPOTIFY_CLIENT_SECRET=...
-export SPOTIFY_REFRESH_TOKEN=...
+cp backend/.example.env backend/.env   # then fill in the Spotify values
 docker compose up --build
 ```
+
+### Minting the service-account refresh token
+
+There is no per-user Spotify OAuth: the app acts as a single service account, and
+Spotify has no notion of an app-owned playlist, so creating archive playlists
+needs a token that acts as that user. Client credentials are not enough.
+
+Run this once, with the app's Client ID and secret already in `backend/.env`:
+
+```sh
+cd backend && go run ./cmd/spotify-auth
+```
+
+It prints an authorisation URL, captures the callback on a loopback listener, and
+writes `SPOTIFY_REFRESH_TOKEN` back into `backend/.env`. The token is never
+printed. Approve as the **service account**, not a personal account — the tool
+forces Spotify's account chooser and afterwards reports which account it
+authorised, so a mistake is obvious.
+
+The default redirect URI is `http://127.0.0.1:8888/callback` and it must be
+registered on the Spotify app exactly. Pass `-redirect` if the app has a
+different one registered.
 
 The frontend is available at <http://localhost:5173>, the API at
 <http://localhost:8080>, and watcher diagnostics at <http://localhost:8081>.
@@ -46,9 +66,11 @@ Production secrets belong in the SOPS-encrypted Kubernetes secret manifest:
 - `SPOTIFY_REFRESH_TOKEN`
 
 The API also receives `REDIS_URL=redis://redis:6379` and
-`SECURE_COOKIES=true` from its Deployment. Local Compose supplies development-only
-database, Redis, JWT, and cookie settings inline; Spotify values always come from
-the developer's environment.
+`SECURE_COOKIES=true` from its Deployment. Local Compose supplies the
+development-only database, Redis and cookie settings inline, and loads secrets
+from `backend/.env` via `env_file`. Secrets must not be listed under Compose's
+`environment:` block: an unset shell variable expands to the empty string, which
+counts as "already set" and stops the `.env` file from being applied.
 
 ## Deployment
 
