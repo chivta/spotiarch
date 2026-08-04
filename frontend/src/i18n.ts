@@ -1,4 +1,4 @@
-export type Lang = "en" | "ru";
+export type Lang = "en" | "uk";
 
 const en = {
   brand: "spotiarch",
@@ -9,7 +9,7 @@ const en = {
   logOut: "Log out",
   language: "Language",
   english: "English",
-  russian: "Русский",
+  ukrainian: "Українська",
   footer: "Built for playlists that deserve a memory.",
   loading: "Loading…",
   back: "Back",
@@ -123,14 +123,131 @@ export type T = {
 };
 export type TranslationKey = keyof T;
 
-const ru: T = {
-  brand: "spotiarch", navHome: "Главная", navDashboard: "Архивы", signIn: "Войти", createAccount: "Создать аккаунт", logOut: "Выйти", language: "Язык", english: "English", russian: "Русский", footer: "Для плейлистов, которые достойны памяти.", loading: "Загрузка…", back: "Назад", retry: "Повторить", delete: "Удалить", deleting: "Удаление…", cancel: "Отмена",
-  heroEyebrow: "Ваш плейлист — навсегда", heroTitle: "Сохраните каждый трек, который когда-то любили.", heroBody: "Spotiarch следит за вашим плейлистом Spotify и хранит его пополняемый архив.", playlistUrlLabel: "Ссылка на плейлист Spotify", playlistUrlPlaceholder: "https://open.spotify.com/playlist/…", resolvePlaylist: "Показать плейлист", resolvingPlaylist: "Ищем плейлист…", previewTitle: "Готов к архивации", byOwner: "автор", trackCount: count => `${count} ${count % 10 === 1 && count % 100 !== 11 ? "трек" : count % 10 >= 2 && count % 10 <= 4 && (count % 100 < 10 || count % 100 >= 20) ? "трека" : "треков"}`, startWatching: "Начать отслеживание", startingWatch: "Подготовка…", pendingSafe: "Выбор сохранён для этой сессии. Войдите или создайте аккаунт — и вы вернётесь к этому шагу.", appendOnlyShort: "Треки остаются в архиве, даже если исчезают из исходного плейлиста.",
-  authTitle: "Продолжите создание архива", authBody: "Выбранный плейлист ждёт вас. Вставлять ссылку ещё раз не придётся.", logIn: "Войти", signUp: "Регистрация", emailLabel: "Email", emailPlaceholder: "you@example.com", passwordLabel: "Пароль", passwordPlaceholder: "Минимум 8 символов", loggingIn: "Входим…", signingUp: "Создаём аккаунт…",
-  verificationEyebrow: "Проверка владельца", verificationTitle: "Добавьте этот токен в описание плейлиста", verificationBody: "Откройте исходный плейлист в Spotify, измените его описание и вставьте токен ниже. Только владелец может менять это поле.", verificationSelectionSaved: "Вы продолжаете с плейлистом, выбранным до входа.", verificationTokenLabel: "Токен подтверждения", copyToken: "Копировать", copiedToken: "Скопировано", openInSpotify: "Открыть в Spotify", checkNow: "Проверить", checkingNow: "Проверяем описание…", verificationRetry: "Токена пока нет в описании. Сохраните описание в Spotify и попробуйте снова.", tokenRemovable: "Готово. Теперь токен можно удалить из описания в Spotify.",
-  dashboardTitle: "Ваши архивы", dashboardBody: "Каждый архив хранит полную историю исходного плейлиста.", newArchive: "Следить за другим плейлистом", emptyArchivesTitle: "Архивов пока нет", emptyArchivesBody: "Выберите свой публичный плейлист Spotify, чтобы начать.", archiveNow: "Выбрать плейлист", archivedTotal: "В архиве", removedTotal: "Удалено из источника", lastPolled: "Последняя проверка", notPolledYet: "Ожидает первой проверки", viewArchive: "Открыть архив",
-  archiveTitle: "Архив", archivePartsTitle: "Архивные плейлисты Spotify", archivePartsBody: "Все части образуют единый архив. Когда плейлист приближается к лимиту Spotify, Spotiarch создаёт следующую часть.", archivePart: part => `Часть ${part}`, archivePartTracks: count => `${count} в архиве`, archiveRulesTitle: "Как работает архив", archiveAppendOnly: "Архив только пополняется: удаление трека из источника не удаляет его отсюда.", archiveManagedHere: "Архивные плейлисты принадлежат сервисному аккаунту Spotiarch, поэтому удаляйте треки здесь, а не в клиенте Spotify.", localFilesNotice: count => `${count} ${count === 1 ? "локальный файл не удалось" : "локальных файлов не удалось"} архивировать: Spotify не предоставляет для них доступный URI.`, tracksTitle: "Треки", removedOnly: "Только удалённые", noTracks: "На этой странице нет треков.", metadataUnavailable: "Метаданные трека недоступны", firstSeen: "Впервые замечен", removedOn: "Удалён", previousPage: "Назад", nextPage: "Далее", pageStatus: (from, to, total) => `${from}–${to} из ${total}`, confirmDeleteTrack: "Навсегда удалить этот трек из архива?", deleteTrackLabel: name => `Удалить ${name} из архива`, deleteWatch: "Удалить архив", confirmDeleteWatch: "Удалить этот архив и всю сохранённую историю?",
-  errorInternal: "Что-то пошло не так. Попробуйте снова.", errorDatabase: "База архивов недоступна. Попробуйте позже.", errorSpotifyApi: "Не удалось связаться со Spotify. Попробуйте позже.", errorTooManyRequests: "Слишком много запросов. Подождите и попробуйте снова.", errorNotFound: "Запрошенный объект не найден.", errorSpotifyNotFound: "Spotify не нашёл этот плейлист. Проверьте ссылку.", errorBadRequest: "Проверьте введённые данные.", errorUnauthorized: "Войдите, чтобы продолжить.", errorForbidden: "У вас нет разрешения на это действие.", errorAnonQuotaExceeded: "Лимит анонимных просмотров исчерпан. Войдите, чтобы продолжить.", errorEmailExists: "Аккаунт с таким email уже существует.", errorInvalidCredentials: "Неверный email или пароль.", errorInvalidPlaylistUrl: "Введите корректную ссылку на плейлист Spotify.", errorPlaylistNotPublic: "Этот плейлист закрыт. Сделайте его публичным в Spotify и повторите.", errorNoPendingSelection: "Сохранённого плейлиста нет. Сначала выберите его.", errorPendingExpired: "Сохранённый выбор устарел. Выберите плейлист снова.", errorVerificationTokenNotFound: "В описании плейлиста пока нет токена подтверждения.", errorAlreadyVerified: "Этот плейлист уже подтверждён.", errorPlaylistNotVerified: "Подтвердите владение плейлистом перед созданием архива.", errorWatchExists: "Этот плейлист уже отслеживается.", errorArchiveTrackNotFound: "Этого трека больше нет в архиве.", errorNetwork: "Сервер недоступен. Проверьте соединение и повторите.",
+// Ukrainian, like other Slavic languages, needs three plural forms:
+// 1 трек, 2–4 треки, 5+ треків.
+const plural = (count: number, one: string, few: string, many: string) => {
+  const mod10 = count % 10;
+  const mod100 = count % 100;
+  if (mod10 === 1 && mod100 !== 11) return one;
+  if (mod10 >= 2 && mod10 <= 4 && (mod100 < 10 || mod100 >= 20)) return few;
+  return many;
 };
 
-export const translations: Record<Lang, T> = { en, ru };
+const uk: T = {
+  brand: "spotiarch",
+  navHome: "Головна",
+  navDashboard: "Архіви",
+  signIn: "Увійти",
+  createAccount: "Створити акаунт",
+  logOut: "Вийти",
+  language: "Мова",
+  english: "English",
+  ukrainian: "Українська",
+  footer: "Для плейлистів, які варті пам’яті.",
+  loading: "Завантаження…",
+  back: "Назад",
+  retry: "Спробувати ще раз",
+  delete: "Видалити",
+  deleting: "Видалення…",
+  cancel: "Скасувати",
+
+  heroEyebrow: "Ваш плейлист — назавжди",
+  heroTitle: "Збережіть кожен трек, який колись любили.",
+  heroBody: "Spotiarch стежить за вашим плейлистом Spotify і веде архів, який лише поповнюється.",
+  playlistUrlLabel: "Посилання на плейлист Spotify",
+  playlistUrlPlaceholder: "https://open.spotify.com/playlist/…",
+  resolvePlaylist: "Показати плейлист",
+  resolvingPlaylist: "Шукаємо плейлист…",
+  previewTitle: "Готовий до архівування",
+  byOwner: "автор",
+  trackCount: count => `${count} ${plural(count, "трек", "треки", "треків")}`,
+  startWatching: "Почати стеження",
+  startingWatch: "Підготовка…",
+  pendingSafe: "Вибір збережено для цієї сесії. Увійдіть або створіть акаунт — і ви повернетесь саме сюди.",
+  appendOnlyShort: "Треки залишаються в архіві, навіть коли зникають із вихідного плейлиста.",
+
+  authTitle: "Продовжіть створення архіву",
+  authBody: "Обраний плейлист чекає. Вставляти посилання ще раз не доведеться.",
+  logIn: "Увійти",
+  signUp: "Реєстрація",
+  emailLabel: "Email",
+  emailPlaceholder: "you@example.com",
+  passwordLabel: "Пароль",
+  passwordPlaceholder: "Щонайменше 8 символів",
+  loggingIn: "Входимо…",
+  signingUp: "Створюємо акаунт…",
+
+  verificationEyebrow: "Перевірка власника",
+  verificationTitle: "Додайте цей токен в опис плейлиста",
+  verificationBody: "Відкрийте вихідний плейлист у Spotify, змініть його опис і вставте токен нижче. Лише власник плейлиста може редагувати це поле.",
+  verificationSelectionSaved: "Ви продовжуєте з плейлистом, обраним до входу.",
+  verificationTokenLabel: "Токен підтвердження",
+  copyToken: "Копіювати",
+  copiedToken: "Скопійовано",
+  openInSpotify: "Відкрити у Spotify",
+  checkNow: "Перевірити",
+  checkingNow: "Перевіряємо опис…",
+  verificationRetry: "Токена ще немає в описі плейлиста. Збережіть опис у Spotify і спробуйте ще раз.",
+  tokenRemovable: "Підтверджено. Тепер токен можна прибрати з опису у Spotify.",
+
+  dashboardTitle: "Ваші архіви",
+  dashboardBody: "Кожен архів зберігає повну історію свого вихідного плейлиста.",
+  newArchive: "Стежити за іншим плейлистом",
+  emptyArchivesTitle: "Архівів поки немає",
+  emptyArchivesBody: "Оберіть свій публічний плейлист Spotify, щоб почати.",
+  archiveNow: "Обрати плейлист",
+  archivedTotal: "В архіві",
+  removedTotal: "Видалено з джерела",
+  lastPolled: "Остання перевірка",
+  notPolledYet: "Очікує на першу перевірку",
+  viewArchive: "Відкрити архів",
+
+  archiveTitle: "Архів",
+  archivePartsTitle: "Архівні плейлисти Spotify",
+  archivePartsBody: "Усі частини утворюють єдиний архів. Коли плейлист наближається до ліміту Spotify, Spotiarch створює наступну частину.",
+  archivePart: part => `Частина ${part}`,
+  archivePartTracks: count => `${count} в архіві`,
+  archiveRulesTitle: "Як працює архів",
+  archiveAppendOnly: "Архів лише поповнюється: видалення треку з джерела не прибирає його звідси.",
+  archiveManagedHere: "Архівні плейлисти належать сервісному акаунту Spotiarch, тому видаляйте треки тут, а не в клієнті Spotify.",
+  localFilesNotice: count =>
+    `${count} ${plural(count, "локальний файл", "локальні файли", "локальних файлів")} не вдалося заархівувати: Spotify не надає для них доступного URI.`,
+  tracksTitle: "Треки",
+  removedOnly: "Лише видалені",
+  noTracks: "На цій сторінці немає треків.",
+  metadataUnavailable: "Метадані треку недоступні",
+  firstSeen: "Уперше помічено",
+  removedOn: "Видалено",
+  previousPage: "Назад",
+  nextPage: "Далі",
+  pageStatus: (from, to, total) => `${from}–${to} з ${total}`,
+  confirmDeleteTrack: "Назавжди видалити цей трек з архіву?",
+  deleteTrackLabel: name => `Видалити ${name} з архіву`,
+  deleteWatch: "Видалити архів",
+  confirmDeleteWatch: "Видалити цей архів і всю збережену історію?",
+
+  errorInternal: "Щось пішло не так. Спробуйте ще раз.",
+  errorDatabase: "База архівів недоступна. Спробуйте пізніше.",
+  errorSpotifyApi: "Не вдалося зв’язатися зі Spotify. Спробуйте пізніше.",
+  errorTooManyRequests: "Забагато запитів. Зачекайте і спробуйте ще раз.",
+  errorNotFound: "Запитаний об’єкт не знайдено.",
+  errorSpotifyNotFound: "Spotify не знайшов цей плейлист. Перевірте посилання і спробуйте ще раз.",
+  errorBadRequest: "Перевірте введені дані.",
+  errorUnauthorized: "Увійдіть, щоб продовжити.",
+  errorForbidden: "У вас немає дозволу на цю дію.",
+  errorAnonQuotaExceeded: "Ліміт анонімних переглядів вичерпано. Увійдіть, щоб продовжити.",
+  errorEmailExists: "Акаунт із такою поштою вже існує.",
+  errorInvalidCredentials: "Невірна пошта або пароль.",
+  errorInvalidPlaylistUrl: "Введіть коректне посилання на плейлист Spotify.",
+  errorPlaylistNotPublic: "Цей плейлист закритий. Зробіть його публічним у Spotify і спробуйте ще раз.",
+  errorNoPendingSelection: "Збереженого вибору немає. Спочатку оберіть плейлист.",
+  errorPendingExpired: "Збережений вибір застарів. Оберіть плейлист ще раз.",
+  errorVerificationTokenNotFound: "В описі плейлиста ще немає токена підтвердження.",
+  errorAlreadyVerified: "Цей плейлист уже підтверджено.",
+  errorPlaylistNotVerified: "Підтвердіть володіння плейлистом перед створенням архіву.",
+  errorWatchExists: "За цим плейлистом ви вже стежите.",
+  errorArchiveTrackNotFound: "Цього треку більше немає в архіві.",
+  errorNetwork: "Сервер недоступний. Перевірте з’єднання і спробуйте ще раз.",
+};
+
+export const translations: Record<Lang, T> = { en, uk };

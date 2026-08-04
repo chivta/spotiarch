@@ -7,9 +7,9 @@ const STORAGE_KEY = "spotiarch_lang";
 function detectLanguage(): Lang {
   try {
     const stored = localStorage.getItem(STORAGE_KEY);
-    if (stored === "en" || stored === "ru") return stored;
+    if (stored === "en" || stored === "uk") return stored;
   } catch { /* Storage may be unavailable. */ }
-  return navigator.language?.startsWith("ru") ? "ru" : "en";
+  return navigator.language?.startsWith("uk") ? "uk" : "en";
 }
 
 interface LanguageContextValue { lang: Lang; setLang: (lang: Lang) => void }

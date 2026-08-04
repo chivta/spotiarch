@@ -13,7 +13,7 @@ export default function Dashboard() {
   const [error, setError] = useState<unknown>(null);
   const { lang } = useLanguage();
   const tx = translations[lang];
-  const locale = lang === "ru" ? "ru-RU" : "en-US";
+  const locale = lang === "uk" ? "uk-UA" : "en-US";
 
   useEffect(() => { getWatches().then(setWatches).catch(setError); }, []);
 

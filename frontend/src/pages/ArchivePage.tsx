@@ -22,7 +22,7 @@ export default function ArchivePage() {
   const [deletingURI, setDeletingURI] = useState<string | null>(null);
   const { lang } = useLanguage();
   const tx = translations[lang];
-  const locale = lang === "ru" ? "ru-RU" : "en-US";
+  const locale = lang === "uk" ? "uk-UA" : "en-US";
   const location = useLocation();
   const navigate = useNavigate();
   const verified = Boolean((location.state as { verified?: boolean } | null)?.verified);
