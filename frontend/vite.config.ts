@@ -8,8 +8,11 @@ export default defineConfig(({ mode }) => {
     plugins: [react()],
     server: {
       host: true,
+      // The SPA calls a relative /api so the browser stays same-origin, matching
+      // production where traefik serves both from one host. VITE_API_URL is the
+      // server-side proxy target, not something the browser ever sees.
       proxy: {
-        "/api": env.VITE_API_URL || "http://localhost:3000",
+        "/api": env.VITE_API_URL || "http://localhost:8080",
       },
     },
   };
