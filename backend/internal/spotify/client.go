@@ -18,8 +18,8 @@ import (
 )
 
 const (
-	tokenURL = "https://accounts.spotify.com/api/token"
-	apiBase  = "https://api.spotify.com/v1"
+	defaultTokenURL = "https://accounts.spotify.com/api/token"
+	apiBase         = "https://api.spotify.com/v1"
 
 	// itemsPageLimit is Spotify's maximum page size for playlist items.
 	itemsPageLimit = 100
@@ -49,6 +49,7 @@ func NewClient(clientID, clientSecret, refreshToken string) *Client {
 		clientID:     clientID,
 		clientSecret: clientSecret,
 		refreshToken: refreshToken,
+		tokenURL:     defaultTokenURL,
 		sem:          make(chan struct{}, maxConcurrent),
 		window:       NewSlidingWindow(slidingWindowSize, requestsPerWindow),
 	}
@@ -61,6 +62,10 @@ type Client struct {
 	httpClient   *http.Client
 	clientID     string
 	clientSecret string
+	tokenURL     string
+
+	// refreshToken is guarded by tokenMu because Spotify may hand back a rotated
+	// one on refresh.
 	refreshToken string
 
 	blockedUntil time.Time
@@ -96,7 +101,7 @@ func (c *Client) getValidToken(ctx context.Context) (string, error) {
 		"grant_type":    {"refresh_token"},
 		"refresh_token": {c.refreshToken},
 	}
-	req, err := http.NewRequestWithContext(ctx, http.MethodPost, tokenURL, strings.NewReader(form.Encode()))
+	req, err := http.NewRequestWithContext(ctx, http.MethodPost, c.tokenURL, strings.NewReader(form.Encode()))
 	if err != nil {
 		return "", err
 	}
@@ -113,11 +118,21 @@ func (c *Client) getValidToken(ctx context.Context) (string, error) {
 	}
 
 	var tokenResp struct {
-		AccessToken string `json:"access_token"`
-		ExpiresIn   int    `json:"expires_in"`
+		AccessToken  string `json:"access_token"`
+		ExpiresIn    int    `json:"expires_in"`
+		RefreshToken string `json:"refresh_token"`
 	}
 	if err := json.NewDecoder(resp.Body).Decode(&tokenResp); err != nil {
 		return "", err
+	}
+
+	// Spotify may rotate the refresh token. Keeping the stale one would break
+	// every refresh after the old token is invalidated. This only lives for the
+	// process lifetime — a restart falls back to SPOTIFY_REFRESH_TOKEN, which
+	// Spotify keeps honouring, so there is nothing to persist.
+	if tokenResp.RefreshToken != "" && tokenResp.RefreshToken != c.refreshToken {
+		c.refreshToken = tokenResp.RefreshToken
+		log.Info().Msg("spotify rotated the refresh token")
 	}
 
 	c.accessToken = tokenResp.AccessToken
