@@ -28,7 +28,7 @@ type (
 		ListUnarchived(ctx context.Context, watchID int) ([]domain.ArchiveTrack, error)
 		Counts(ctx context.Context, watchID int) (repository.ArchiveCounts, error)
 		ListTracks(ctx context.Context, watchID int, removedOnly bool, offset, limit int) ([]domain.ArchiveTrack, int, error)
-		DeleteTrack(ctx context.Context, watchID int, uri string) error
+		ExcludeTrack(ctx context.Context, watchID int, uri string) error
 		CreatePart(ctx context.Context, part *domain.ArchivePart) (int, error)
 		ListParts(ctx context.Context, watchID int) ([]domain.ArchivePart, error)
 		SetPartTrackCount(ctx context.Context, partID, trackCount int) error
@@ -193,7 +193,7 @@ func (s *ArchiveService) DeleteTrack(ctx context.Context, userID, watchID int, u
 	if err != nil {
 		return err
 	}
-	if err := s.archiveRepo.DeleteTrack(ctx, watchID, uri); err != nil {
+	if err := s.archiveRepo.ExcludeTrack(ctx, watchID, uri); err != nil {
 		return err
 	}
 	for _, part := range parts {

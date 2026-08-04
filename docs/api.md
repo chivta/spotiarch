@@ -28,8 +28,8 @@ JWT when no cookie is present, so an unauthenticated visitor always has a stable
 | `GET` | `/api/watches` | `[]WatchResponse` for the caller. |
 | `GET` | `/api/watches/:id` | One `WatchResponse`. |
 | `DELETE` | `/api/watches/:id` | Deletes the watch and all of its stored rows. |
-| `GET` | `/api/watches/:id/tracks` | `ArchiveTracksPage`. Query: `offset` (default 0), `limit` (default and max `TrackPageSize`), `removed=true` to show only tracks the user has since removed. Metadata is re-fetched from Spotify per page and never persisted. |
-| `DELETE` | `/api/watches/:id/tracks/:uri` | Removes one track from the archive, in the database and in the Spotify archive playlist. The user cannot do this in a Spotify client because the archive is owned by the service account. |
+| `GET` | `/api/watches/:id/tracks` | `ArchiveTracksPage`. Query: `offset` (default 0), `limit` (default `TrackPageSize`; a larger value is rejected with `BAD_REQUEST` rather than clamped), `removed=true` to show only tracks the user has since removed. Metadata is re-fetched from Spotify per page and never persisted. |
+| `DELETE` | `/api/watches/:id/tracks/:uri` | Removes one track from the archive, in the database and in the Spotify archive playlist. The user cannot do this in a Spotify client because the archive is owned by the service account. The row is kept as a tombstone so a later poll cannot re-add a track that is still in the source; deleting twice returns `ARCHIVE_TRACK_NOT_FOUND`. |
 
 ## Operational
 

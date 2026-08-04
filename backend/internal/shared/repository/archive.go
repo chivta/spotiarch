@@ -22,6 +22,8 @@ type ArchiveRepo struct {
 
 // UpsertSeen records the tracks currently present in the source playlist.
 // Re-appearing tracks clear their removal stamp rather than being duplicated.
+// Tombstoned rows are left alone: the conflicting insert is swallowed, so a
+// track the user deleted through the UI is never resurrected by a later poll.
 func (r *ArchiveRepo) UpsertSeen(ctx context.Context, watchID int, items []domain.SourceItem) error {
 	if len(items) == 0 {
 		return nil
@@ -32,7 +34,8 @@ func (r *ArchiveRepo) UpsertSeen(ctx context.Context, watchID int, items []domai
 		batch.Queue(
 			`INSERT INTO archive_tracks (watch_id, uri, isrc, in_source)
 			 VALUES ($1, $2, $3, TRUE)
-			 ON CONFLICT (watch_id, isrc) DO UPDATE SET in_source = TRUE, removed_at = NULL`,
+			 ON CONFLICT (watch_id, isrc) DO UPDATE SET in_source = TRUE, removed_at = NULL
+			 WHERE archive_tracks.excluded_at IS NULL`,
 			watchID, item.URI, item.ISRC,
 		)
 	}
@@ -50,7 +53,7 @@ func (r *ArchiveRepo) MarkRemoved(ctx context.Context, watchID int, presentISRCs
 	tag, err := r.db.Exec(
 		ctx,
 		`UPDATE archive_tracks SET in_source = FALSE, removed_at = now()
-		 WHERE watch_id = $1 AND in_source = TRUE AND NOT (isrc = ANY($2))`,
+		 WHERE watch_id = $1 AND in_source = TRUE AND excluded_at IS NULL AND NOT (isrc = ANY($2))`,
 		watchID, presentISRCs,
 	)
 	if err != nil {
@@ -65,7 +68,7 @@ func (r *ArchiveRepo) MarkRemoved(ctx context.Context, watchID int, presentISRCs
 func (r *ArchiveRepo) ListUnarchived(ctx context.Context, watchID int) ([]domain.ArchiveTrack, error) {
 	rows, err := r.db.Query(ctx,
 		`SELECT id, uri, isrc FROM archive_tracks
-		 WHERE watch_id = $1 AND archived_at IS NULL ORDER BY id ASC`, watchID)
+		 WHERE watch_id = $1 AND archived_at IS NULL AND excluded_at IS NULL ORDER BY id ASC`, watchID)
 	if err != nil {
 		log.Error().Msgf("db error: %T: %v", err, err)
 		return nil, domain.ErrDatabaseFailure
@@ -101,11 +104,14 @@ func (r *ArchiveRepo) MarkArchived(ctx context.Context, ids []int) error {
 	return nil
 }
 
-// DeleteTrack removes a single track from the archive. This only happens through
-// an explicit user edit in the web UI; watching never deletes.
-func (r *ArchiveRepo) DeleteTrack(ctx context.Context, watchID int, uri string) error {
+// ExcludeTrack tombstones a single track. This only happens through an explicit
+// user edit in the web UI; watching never removes anything. The row survives so
+// its (watch_id, isrc) key keeps blocking re-insertion while the track is still
+// in the source playlist.
+func (r *ArchiveRepo) ExcludeTrack(ctx context.Context, watchID int, uri string) error {
 	tag, err := r.db.Exec(ctx,
-		`DELETE FROM archive_tracks WHERE watch_id = $1 AND uri = $2`, watchID, uri)
+		`UPDATE archive_tracks SET excluded_at = now()
+		 WHERE watch_id = $1 AND uri = $2 AND excluded_at IS NULL`, watchID, uri)
 	if err != nil {
 		log.Error().Msgf("db error: %T: %v", err, err)
 		return domain.ErrDatabaseFailure
@@ -125,7 +131,7 @@ func (r *ArchiveRepo) Counts(ctx context.Context, watchID int) (ArchiveCounts, e
 	var counts ArchiveCounts
 	err := r.db.QueryRow(ctx,
 		`SELECT count(*), count(*) FILTER (WHERE removed_at IS NOT NULL)
-		 FROM archive_tracks WHERE watch_id = $1`, watchID,
+		 FROM archive_tracks WHERE watch_id = $1 AND excluded_at IS NULL`, watchID,
 	).Scan(&counts.Total, &counts.Removed)
 	if err != nil {
 		log.Error().Msgf("db error: %T: %v", err, err)
@@ -137,9 +143,10 @@ func (r *ArchiveRepo) Counts(ctx context.Context, watchID int) (ArchiveCounts, e
 // ListTracks returns one page of the archive, newest first, optionally narrowed
 // to tracks the user has since removed from the source.
 func (r *ArchiveRepo) ListTracks(ctx context.Context, watchID int, removedOnly bool, offset, limit int) ([]domain.ArchiveTrack, int, error) {
-	filter := ``
+	// tombstoned tracks are gone as far as the user is concerned
+	filter := ` AND excluded_at IS NULL`
 	if removedOnly {
-		filter = ` AND removed_at IS NOT NULL`
+		filter += ` AND removed_at IS NOT NULL`
 	}
 
 	var total int
