@@ -1,29 +1,42 @@
-import axios from 'axios'
-import router from '@/router'
+const DEFAULT_API_BASE_URL = "/api";
+const JSON_CONTENT_TYPE = "application/json";
 
-const apiClient = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000/api',
-  withCredentials: true,
-  headers: {
-    'Content-Type': 'application/json'
+const baseURL = (import.meta.env.VITE_API_BASE_URL || DEFAULT_API_BASE_URL).replace(/\/$/, "");
+
+interface ErrorResponse {
+  code?: string;
+}
+
+export class ApiError extends Error {
+  readonly code: string;
+  readonly status: number;
+
+  constructor(code: string, status: number) {
+    super(code);
+    this.name = "ApiError";
+    this.code = code;
+    this.status = status;
   }
-})
+}
 
-apiClient.interceptors.response.use(
-  (response) => response,
-  (error) => {
-    if (error.response?.status === 401) {
-      const publicRoutes = ['login', 'signup', 'landing']
-      const currentRoute = router.currentRoute.value.name
-      if (!publicRoutes.includes(currentRoute as string)) {
-        router.push({
-          name: 'login',
-          query: { redirect: router.currentRoute.value.fullPath }
-        })
-      }
-    }
-    return Promise.reject(error)
+export async function apiRequest<T>(path: string, init: RequestInit = {}): Promise<T> {
+  const headers = new Headers(init.headers);
+  if (init.body && !headers.has("Content-Type")) headers.set("Content-Type", JSON_CONTENT_TYPE);
+
+  let response: Response;
+  try {
+    response = await fetch(`${baseURL}${path}`, { ...init, headers, credentials: "include" });
+  } catch {
+    throw new ApiError("NETWORK_ERROR", 0);
   }
-)
 
-export default apiClient
+  if (!response.ok) {
+    const body = await response.json().catch(() => ({})) as ErrorResponse;
+    throw new ApiError(body.code || "INTERNAL_ERROR", response.status);
+  }
+
+  if (response.status === 204 || response.headers.get("content-length") === "0") {
+    return undefined as T;
+  }
+  return response.json() as Promise<T>;
+}
