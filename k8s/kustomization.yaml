@@ -1,29 +1,29 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 resources:
-  - namespace.yaml
-  - api/deployment.yaml
-  - api/service.yaml
-  - api/service-monitor.yaml
-  - watcher/deployment.yaml
-  - watcher/service.yaml
-  - watcher/service-monitor.yaml
-  - frontend/deployment.yaml
-  - frontend/service.yaml
-  - postgres/statefulset.yaml
-  - postgres/service.yaml
-  - redis/statefulset.yaml
-  - redis/service.yaml
-  - ingress.yaml
-  - secrets.enc.yaml
+- namespace.yaml
+- api/deployment.yaml
+- api/service.yaml
+- api/service-monitor.yaml
+- watcher/deployment.yaml
+- watcher/service.yaml
+- watcher/service-monitor.yaml
+- frontend/deployment.yaml
+- frontend/service.yaml
+- postgres/statefulset.yaml
+- postgres/service.yaml
+- redis/statefulset.yaml
+- redis/service.yaml
+- ingress.yaml
+- secrets.enc.yaml
 
 images:
-  - name: ghcr.io/chivta/spotiarch/api
-    newName: ghcr.io/chivta/spotiarch/api
-    newTag: placeholder
-  - name: ghcr.io/chivta/spotiarch/watcher
-    newName: ghcr.io/chivta/spotiarch/watcher
-    newTag: placeholder
-  - name: ghcr.io/chivta/spotiarch/frontend
-    newName: ghcr.io/chivta/spotiarch/frontend
-    newTag: placeholder
+- name: ghcr.io/chivta/spotiarch/api
+  newName: ghcr.io/chivta/spotiarch/api
+  newTag: d6b1f29e4c8f3879e64cd839d26982c8c7734f2e
+- name: ghcr.io/chivta/spotiarch/frontend
+  newName: ghcr.io/chivta/spotiarch/frontend
+  newTag: d6b1f29e4c8f3879e64cd839d26982c8c7734f2e
+- name: ghcr.io/chivta/spotiarch/watcher
+  newName: ghcr.io/chivta/spotiarch/watcher
+  newTag: d6b1f29e4c8f3879e64cd839d26982c8c7734f2e
