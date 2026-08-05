@@ -52,6 +52,7 @@ export default function Landing() {
     <Layout>
       <div style={{ maxWidth: CONTENT_WIDTH, margin: "0 auto", padding: "78px 18px 46px" }}>
         <section style={{ maxWidth: 800, marginBottom: 42 }}>
+          <img src="/logo.svg" alt="" aria-hidden style={{ width: 72, height: 72, display: "block", marginBottom: 22 }} />
           <div style={{ color: COLORS.green, fontSize: 13, fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.13em", marginBottom: 14 }}>{tx.heroEyebrow}</div>
           <h1 style={{ margin: "0 0 18px", fontSize: "clamp(2.7rem, 8vw, 5.7rem)", lineHeight: 0.96, letterSpacing: "-0.065em", maxWidth: 850 }}>{tx.heroTitle}</h1>
           <p style={{ color: COLORS.muted, lineHeight: 1.7, fontSize: "clamp(1rem, 2vw, 1.2rem)", maxWidth: 670 }}>{tx.heroBody}</p>
