@@ -23,7 +23,7 @@ images:
   newTag: d6b1f29e4c8f3879e64cd839d26982c8c7734f2e
 - name: ghcr.io/chivta/spotiarch/frontend
   newName: ghcr.io/chivta/spotiarch/frontend
-  newTag: d6b1f29e4c8f3879e64cd839d26982c8c7734f2e
+  newTag: 6409651c564c9eb7d4b5b1a9be4542232319833d
 - name: ghcr.io/chivta/spotiarch/watcher
   newName: ghcr.io/chivta/spotiarch/watcher
   newTag: d6b1f29e4c8f3879e64cd839d26982c8c7734f2e
